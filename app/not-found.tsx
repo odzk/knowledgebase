@@ -16,7 +16,7 @@ export default function NotFound() {
           </div>
           <h1 className="font-heading text-2xl font-bold text-iron-grey mb-2">Page not found</h1>
           <p className="font-body text-gray-500 mb-8">
-            The article or page you're looking for doesn't exist or has been moved.
+            The article or page you&apos;re looking for doesn&apos;t exist or has been moved.
           </p>
           <Link href="/" className="btn-primary inline-block">
             Back to Knowledge Base

@@ -22,8 +22,8 @@ const config: Config = {
         'taupe': '#A47F7B',
       },
       fontFamily: {
-        'heading': ['Comfortaa', 'sans-serif'],
-        'body': ['Raleway', 'sans-serif'],
+        'heading': ['var(--font-comfortaa)', 'sans-serif'],
+        'body': ['var(--font-raleway)', 'sans-serif'],
       },
       borderRadius: {
         'nuvho': '14px',

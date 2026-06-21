@@ -57,7 +57,7 @@ function SearchResults() {
             </div>
             <h2 className="font-heading text-lg font-semibold text-iron-grey mb-2">No results found</h2>
             <p className="font-body text-gray-500 mb-6">
-              We couldn't find anything matching <strong>"{query}"</strong>. Try different keywords.
+              We couldn&apos;t find anything matching <strong>&quot;{query}&quot;</strong>. Try different keywords.
             </p>
             <Link href="/" className="btn-primary inline-block">Browse all topics</Link>
           </div>
