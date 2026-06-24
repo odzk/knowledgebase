@@ -2,14 +2,15 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
-import { getAllArticleSlugs, getCategoryBySlug, getArticleBySlug } from '@/lib/data'
+import { getCategoryBySlug, getArticleBySlug } from '@/lib/data'
+
+// Force dynamic rendering — prevents Next.js from calling the DB during `next build`
+// (DigitalOcean build containers have no DB access). New articles appear immediately
+// without a redeploy.
+export const dynamic = 'force-dynamic'
 
 interface Props {
   params: { categorySlug: string; slug: string }
-}
-
-export async function generateStaticParams() {
-  return getAllArticleSlugs()
 }
 
 export async function generateMetadata({ params }: Props) {

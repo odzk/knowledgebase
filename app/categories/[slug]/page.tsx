@@ -4,15 +4,15 @@ import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import ArticleCard from '@/components/ArticleCard'
-import { getAllCategorySlugs, getCategoryBySlug } from '@/lib/data'
+import { getCategoryBySlug } from '@/lib/data'
+
+// Force dynamic rendering — prevents Next.js from calling the DB during `next build`
+// (DigitalOcean build containers have no DB access). New categories appear immediately
+// without a redeploy.
+export const dynamic = 'force-dynamic'
 
 interface Props {
   params: { slug: string }
-}
-
-export async function generateStaticParams() {
-  const slugs = await getAllCategorySlugs()
-  return slugs.map(slug => ({ slug }))
 }
 
 export async function generateMetadata({ params }: Props) {
