@@ -46,7 +46,7 @@ export default function SearchHero() {
 
             <button
               type="submit"
-              className="absolute right-2 top-1/2 -translate-y-1/2 btn-primary text-sm py-2 px-5"
+              className="absolute right-2 top-1/2 -translate-y-1/2 bg-blue-slate text-white font-heading font-semibold rounded-full text-sm py-2 px-5 transition-colors"
             >
               Search
             </button>

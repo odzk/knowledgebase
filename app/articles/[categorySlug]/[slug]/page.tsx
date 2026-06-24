@@ -3,6 +3,7 @@ import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { getCategoryBySlug, getArticleBySlug } from '@/lib/data'
+import { getSession } from '@/lib/auth'
 
 // Force dynamic rendering — prevents Next.js from calling the DB during `next build`
 // (DigitalOcean build containers have no DB access). New articles appear immediately
@@ -23,10 +24,12 @@ export async function generateMetadata({ params }: Props) {
 }
 
 export default async function ArticlePage({ params }: Props) {
-  const [article, category] = await Promise.all([
+  const [article, category, session] = await Promise.all([
     getArticleBySlug(params.categorySlug, params.slug),
     getCategoryBySlug(params.categorySlug),
+    getSession(),
   ])
+  const canEdit = !!session?.email.endsWith('@nuvho.com')
   if (!article || !category) notFound()
 
   return (
@@ -56,12 +59,27 @@ export default async function ArticlePage({ params }: Props) {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
           <div className="nuvho-card p-8 sm:p-10">
             {/* Meta */}
-            <div className="flex items-center gap-3 mb-6">
+            <div className="flex items-center gap-3 mb-6 flex-wrap">
               <span className="px-3 py-1 rounded-full bg-tropical-teal/10 text-blue-slate text-xs font-heading font-semibold">
                 {category.title}
               </span>
               <span className="text-xs text-gray-400 font-body">{article.readTime} min read</span>
               <span className="text-xs text-gray-400 font-body">Updated {article.updatedAt}</span>
+
+              {canEdit && (
+                <Link
+                  href={`/articles/${params.categorySlug}/${params.slug}/edit`}
+                  className="ml-auto flex items-center gap-1.5 text-xs font-heading font-semibold
+                             text-blue-slate border border-blue-slate/30 rounded-full px-3 py-1
+                             hover:bg-blue-slate hover:text-white transition-colors"
+                >
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                  Edit Article
+                </Link>
+              )}
             </div>
 
             {/* Title */}
