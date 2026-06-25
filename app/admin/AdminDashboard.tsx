@@ -179,7 +179,7 @@ function SyncModal({ target, onClose }: { target: SyncTarget; onClose: (synced?:
             {error && <p className="font-body text-sm text-red-500 mb-3">{error}</p>}
 
             <div className="flex gap-3 justify-end">
-              <button onClick={onClose} className="btn-outline px-4 py-2 text-sm" disabled={loading}>Cancel</button>
+              <button onClick={() => onClose()} className="btn-outline px-4 py-2 text-sm" disabled={loading}>Cancel</button>
               <button
                 onClick={handleSync}
                 disabled={loading}
