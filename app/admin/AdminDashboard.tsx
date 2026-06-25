@@ -147,7 +147,7 @@ function SyncModal({ target, onClose }: { target: SyncTarget; onClose: (synced?:
                 <h3 className="font-heading font-bold text-iron-grey text-base">Sync to Vector DB</h3>
                 <p className="font-body text-xs text-gray-400 mt-0.5 truncate max-w-xs">{target.title}</p>
               </div>
-              <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
+              <button onClick={() => onClose()} className="text-gray-400 hover:text-gray-600 transition-colors">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -492,7 +492,7 @@ function CategoriesTab({ onToast }: { onToast: (msg: string, type: 'success' | '
           <tbody>
             {categories.map(cat => (
               <>
-                <tr key={cat.slug} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
+                <tr key={cat.slug} className="border-b border-gray-50 transition-colors">
                   <td className="px-5 py-3">
                     <p className="font-heading font-semibold text-iron-grey">{cat.title}</p>
                     <p className="font-body text-xs text-gray-400 mt-0.5 truncate max-w-xs">{cat.description}</p>
@@ -792,7 +792,7 @@ function ArticlesTab({
               const key = `${art.category_slug}/${art.slug}`
               return (
                 <>
-                  <tr key={key} className={`border-b border-gray-50 hover:bg-gray-50/50 transition-colors
+                  <tr key={key} className={`border-b border-gray-50 transition-colors
                     ${art.status === 'pending' ? 'bg-yellow-50/30' : ''}`}>
                     <td className="px-5 py-3">
                       <div className="flex items-center gap-2">
