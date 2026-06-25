@@ -10,9 +10,17 @@ interface RouteParams {
 const VALID_TIERS = ['domain', 'internal', 'client', 'confidential'] as const
 type Tier = (typeof VALID_TIERS)[number]
 
-function getVectorPool() {
-  const url = process.env.VECTOR_DATABASE_URL
-  if (!url) throw new Error('VECTOR_DATABASE_URL is not configured.')
+const TIER_ENV_VARS: Record<Tier, string> = {
+  client:       'VECTOR_DB_CLIENT_URL',
+  confidential: 'VECTOR_DB_CONFIDENTIAL_URL',
+  domain:       'VECTOR_DB_DOMAIN_URL',
+  internal:     'VECTOR_DB_INTERNAL_URL',
+}
+
+function getVectorPool(tier: Tier): Pool {
+  const envKey = TIER_ENV_VARS[tier]
+  const url = process.env[envKey]
+  if (!url) throw new Error(`${envKey} is not configured for tier '${tier}'.`)
   return new Pool({ connectionString: url, max: 3 })
 }
 
@@ -90,7 +98,7 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
 
   let vectorPool: Pool | null = null
   try {
-    vectorPool = getVectorPool()
+    vectorPool = getVectorPool(tier)
     await vectorPool.query(
       `DELETE FROM nuvho_embeddings WHERE source_type = $1 AND source_id = $2`,
       [tier, sourceId]

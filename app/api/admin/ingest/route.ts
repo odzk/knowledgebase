@@ -10,8 +10,8 @@ import { getSession } from '@/lib/auth'
  * article in the knowledgebase. An admin must publish it before it appears
  * on the public site.
  *
- * Optionally also writes an embedding to the vector DB if VECTOR_DATABASE_URL
- * and OPENAI_API_KEY are configured.
+ * Optionally also writes an embedding to the tier-specific vector DB if the
+ * matching VECTOR_DB_*_URL env var and OPENAI_API_KEY are configured.
  *
  * Body:
  *   title        string  required
@@ -40,9 +40,17 @@ function stripHtml(html: string): string {
   return html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
 }
 
-function getVectorPool() {
-  const url = process.env.VECTOR_DATABASE_URL
-  if (!url) throw new Error('VECTOR_DATABASE_URL is not configured.')
+const TIER_ENV_VARS: Record<Tier, string> = {
+  client:       'VECTOR_DB_CLIENT_URL',
+  confidential: 'VECTOR_DB_CONFIDENTIAL_URL',
+  domain:       'VECTOR_DB_DOMAIN_URL',
+  internal:     'VECTOR_DB_INTERNAL_URL',
+}
+
+function getVectorPool(tier: Tier): Pool {
+  const envKey = TIER_ENV_VARS[tier]
+  const url = process.env[envKey]
+  if (!url) throw new Error(`${envKey} is not configured for tier '${tier}'.`)
   return new Pool({ connectionString: url, max: 3 })
 }
 
@@ -167,7 +175,7 @@ export async function POST(req: NextRequest) {
 
           let vectorPool: Pool | null = null
           try {
-            vectorPool = getVectorPool()
+            vectorPool = getVectorPool(tier)
             await vectorPool.query(
               `DELETE FROM nuvho_embeddings WHERE source_type = $1 AND source_id = $2`,
               [tier, vid]
