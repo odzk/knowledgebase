@@ -108,6 +108,12 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
        VALUES ($1, $2::vector, $3, $4, $5::jsonb, NOW())`,
       [rawContent, embeddingStr, tier, sourceId, JSON.stringify(metadata)]
     )
+    // Record where this article was synced so the admin dashboard can show it
+    await pool.query(
+      `UPDATE nuvho_kb.articles SET vector_tier = $1, vector_synced_at = NOW()
+       WHERE category_slug = $2 AND slug = $3`,
+      [tier, params.categorySlug, params.slug]
+    )
     return NextResponse.json({ success: true, tier, sourceId })
   } catch (err) {
     console.error('[sync] Vector DB error', err)

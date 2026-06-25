@@ -30,7 +30,9 @@ export async function GET() {
          a.featured,
          a.sort_order,
          a.status,
-         a.updated_at
+         a.updated_at,
+         a.vector_tier,
+         a.vector_synced_at
        FROM nuvho_kb.articles a
        JOIN nuvho_kb.categories c ON c.slug = a.category_slug
        ORDER BY

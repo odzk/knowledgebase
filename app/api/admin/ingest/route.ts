@@ -186,6 +186,12 @@ export async function POST(req: NextRequest) {
               [rawContent, embeddingStr, tier, vid, JSON.stringify(metadata)]
             )
             vectorResult = { success: true, sourceId: vid }
+            // Record where this article was synced
+            await pool.query(
+              `UPDATE nuvho_kb.articles SET vector_tier = $1, vector_synced_at = NOW()
+               WHERE category_slug = $2 AND slug = $3`,
+              [tier, categorySlug.trim(), slug]
+            )
           } finally {
             if (vectorPool) await vectorPool.end().catch(() => {})
           }

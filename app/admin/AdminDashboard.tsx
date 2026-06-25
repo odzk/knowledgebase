@@ -24,6 +24,8 @@ interface AdminArticle {
   sort_order: number
   updated_at: string
   status: 'pending' | 'published'
+  vector_tier?: string | null
+  vector_synced_at?: string | null
 }
 
 type SyncTier = 'domain' | 'internal' | 'client' | 'confidential'
@@ -97,7 +99,7 @@ function ConfirmDialog({ message, onConfirm, onCancel }: { message: string; onCo
 
 // ─── Sync Modal ───────────────────────────────────────────────────────────────
 
-function SyncModal({ target, onClose }: { target: SyncTarget; onClose: () => void }) {
+function SyncModal({ target, onClose }: { target: SyncTarget; onClose: (synced?: boolean) => void }) {
   const [tier, setTier] = useState<SyncTier>('domain')
   const [loading, setLoading] = useState(false)
   const [done, setDone] = useState(false)
@@ -136,7 +138,7 @@ function SyncModal({ target, onClose }: { target: SyncTarget; onClose: () => voi
             <p className="font-body text-sm text-gray-500 mb-5">
               <span className="font-medium">{target.title}</span> has been synced to the <span className="font-medium capitalize">{tier}</span> tier.
             </p>
-            <button onClick={onClose} className="btn-primary px-6 py-2 text-sm">Done</button>
+            <button onClick={() => onClose(true)} className="btn-primary px-6 py-2 text-sm">Done</button>
           </div>
         ) : (
           <>
@@ -781,6 +783,7 @@ function ArticlesTab({
               <th className="text-left font-heading font-semibold text-gray-400 text-xs px-3 py-3 uppercase tracking-wide hidden lg:table-cell">Category</th>
               <th className="text-center font-heading font-semibold text-gray-400 text-xs px-3 py-3 uppercase tracking-wide hidden md:table-cell">Time</th>
               <th className="text-center font-heading font-semibold text-gray-400 text-xs px-3 py-3 uppercase tracking-wide">Status</th>
+              <th className="text-center font-heading font-semibold text-gray-400 text-xs px-3 py-3 uppercase tracking-wide hidden lg:table-cell">Vector DB</th>
               <th className="px-5 py-3 w-44"></th>
             </tr>
           </thead>
@@ -809,6 +812,16 @@ function ArticlesTab({
                     </td>
                     <td className="px-3 py-3 text-center">
                       <StatusBadge status={art.status} />
+                    </td>
+                    <td className="px-3 py-3 text-center hidden lg:table-cell">
+                      {art.vector_tier ? (
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-heading font-semibold border
+                          ${TIERS.find(t => t.value === art.vector_tier)?.color ?? 'bg-gray-100 text-gray-500 border-gray-200'}`}>
+                          {art.vector_tier}
+                        </span>
+                      ) : (
+                        <span className="font-body text-xs text-gray-300">—</span>
+                      )}
                     </td>
                     <td className="px-5 py-3">
                       <div className="flex items-center gap-2 justify-end">
@@ -850,7 +863,7 @@ function ArticlesTab({
                   </tr>
                   {editingKey === key && (
                     <tr key={`${key}-edit`} className="bg-blue-50/40">
-                      <td colSpan={5} className="px-5 py-4">
+                      <td colSpan={6} className="px-5 py-4">
                         <h4 className="font-heading font-semibold text-iron-grey text-sm mb-3">Edit &ldquo;{art.title}&rdquo;</h4>
                         <ArticleForm
                           categories={categories}
@@ -868,7 +881,7 @@ function ArticlesTab({
             })}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-5 py-10 text-center font-body text-sm text-gray-400">
+                <td colSpan={6} className="px-5 py-10 text-center font-body text-sm text-gray-400">
                   {articles.length === 0 ? 'No articles yet.' : 'No articles match the current filters.'}
                 </td>
               </tr>
@@ -886,7 +899,7 @@ function ArticlesTab({
       )}
 
       {syncTarget && (
-        <SyncModal target={syncTarget} onClose={() => setSyncTarget(null)} />
+        <SyncModal target={syncTarget} onClose={(synced) => { setSyncTarget(null); if (synced) load() }} />
       )}
     </div>
   )
